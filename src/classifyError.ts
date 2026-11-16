@@ -1,6 +1,23 @@
+import { HttpError } from "./HttpError.ts";
+
 export type ErrorKind = "abort" | "timeout" | "http" | "network";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function isDomExceptionNamed(error: unknown, name: string): boolean {
+  return error instanceof DOMException && error.name === name;
+}
+
 export function classifyError(error: unknown): ErrorKind {
-  throw new Error("Not implemented");
+  if (isDomExceptionNamed(error, "AbortError")) {
+    return "abort";
+  }
+
+  if (isDomExceptionNamed(error, "TimeoutError")) {
+    return "timeout";
+  }
+
+  if (error instanceof HttpError) {
+    return "http";
+  }
+
+  return "network";
 }
